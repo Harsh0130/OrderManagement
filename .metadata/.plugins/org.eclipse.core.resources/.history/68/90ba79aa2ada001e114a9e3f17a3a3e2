@@ -1,0 +1,61 @@
+package com.example.demo;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class OrderService {
+	@Autowired
+	OrderRepository repo;
+	OrderController oc;
+	public ArrayList<OrderEntity> listAll() {
+		return (ArrayList<OrderEntity>) repo.findAll();
+	}
+	public void save(OrderEntity oe) {
+		repo.save(oe);
+	}
+	public void delete(Integer id) {
+		repo.deleteById(id);
+	}
+//	public OrderEntity update(OrderEntity ord, long id) {
+//		id= ord.getId();
+//		OrderEntity ent = repo.findById(id);
+//		ent.setCustomer_name(ord.getCustomer_name());
+//		ent.setAddress(ord.getAddress());
+//		ent.setQuantity(ord.getQuantity());
+//		return repo.save(ent);
+//	}
+//	public OrderEntity display(Integer id) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+	public OrderEntity get(Integer id)
+	 {
+	 return repo.findById(id).get();
+	 }
+	
+	public OrderEntity getid(int id) {
+		return repo.findById(id);
+	}
+	public OrderEntity update(Integer id, Map<String, Object> field) {
+		OrderEntity ord = repo.findById(id).get();
+		
+		field.forEach((key,values)->{
+			Field fields=ReflectionUtils.findField(OrderEntity.class, key);
+			fields.setAccessible(true);
+			ReflectionUtils.setField(fields, ord, values);
+		});
+		return repo.save(ord);
+	}
+	
+	
+}
